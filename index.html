@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search</title>
+</head>
+<body>
+    <h1>Search</h1>
+    <form action="/search" method="post">
+        <input type="text" name="query" placeholder="Enter your search query">
+        <button type="submit">Search</button>
+    </form>
+    <div id="search-results"></div>
+
+    <script>
+        // Function to handle form submission and display search results
+        function handleSearch() {
+            event.preventDefault();
+            const form = event.target;
+            const query = form.querySelector('input[name="query"]').value;
+
+            // Send the search query to the backend
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('search-results');
+                resultsDiv.innerHTML = '';
+
+                if (data.results.length > 0) {
+                    const ul = document.createElement('ul');
+                    data.results.forEach(result => {
+                        const li = document.createElement('li');
+                        li.textContent = `${result.name}, ${result.age}, ${result.city}`;
+                        ul.appendChild(li);
+                    });
+                    resultsDiv.appendChild(ul);
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = 'No results found.';
+                    resultsDiv.appendChild(p);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Add event listener to the search form
+        const form = document.querySelector('form');
+        form.addEventListener('submit', handleSearch);
+    </script>
+</body>
+</html>
